@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Astro-Dynamics Command Center</title>
+    <title>Astro-Dynamics Command Center (Master Edition)</title>
     <style>
         :root {
             --bg: #020508;
@@ -16,7 +16,6 @@
         body {
             margin: 0; font-family: 'JetBrains Mono', 'Segoe UI', monospace;
             background-color: var(--bg); color: #fff; overflow: hidden; display: flex; height: 100vh;
-            hyphens: none;
         }
 
         #sidebar {
@@ -46,62 +45,64 @@
         .orbit { position: absolute; border: 1px solid rgba(0, 210, 255, 0.08); border-radius: 50%; pointer-events: none; }
         #sun { width: 40px; height: 40px; background: #fff; border-radius: 50%; box-shadow: 0 0 40px #f1c40f; z-index: 10; }
 
-        .p-node {
-            position: absolute; display: flex; flex-direction: column; align-items: center; 
-            transform: translate(-50%, -50%); z-index: 20;
-        }
+        .p-node { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); z-index: 20; }
         .p-core { border-radius: 50%; box-shadow: 0 0 10px rgba(255,255,255,0.1); transition: all 0.5s ease; }
         .p-text { font-size: 9px; margin-top: 4px; color: var(--neon); font-weight: bold; transition: all 0.5s ease; }
 
         .highlight .p-core { transform: scale(2.5); box-shadow: 0 0 25px var(--neon); border: 2px solid #fff; }
-        .highlight .p-text { font-size: 14px; color: #fff; text-shadow: 0 0 10px var(--neon); }
 
         #info-panel {
             position: absolute; top: 0; right: -32%; width: 30%; height: 100%;
             background: var(--glass); border-left: 2px solid var(--neon);
-            padding: 30px; z-index: 1000; transition: right 0.5s ease;
+            padding: 25px; z-index: 1000; transition: right 0.5s ease;
             backdrop-filter: blur(15px); box-sizing: border-box; overflow-y: auto;
         }
         #info-panel.active { right: 0; }
 
-        .info-h { font-size: 1.2rem; color: var(--neon); margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .info-b { font-size: 0.85rem; line-height: 1.6; color: #ccd; margin-bottom: 20px; }
+        .info-h { font-size: 1.2rem; color: var(--neon); margin-bottom: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .info-b { font-size: 0.75rem; line-height: 1.5; color: #ccd; margin-bottom: 15px; }
         
-        #hud-container {
-            width: 100%; height: 180px; background: #000; border: 1px solid var(--neon);
-            border-radius: 4px; position: relative; margin-top: 15px; display: none;
+        .hud-wrapper {
+            width: 100%; height: 260px; background: #000; border: 1px solid var(--neon);
+            border-radius: 4px; position: relative; margin-top: 15px; display: none; overflow: hidden;
         }
-        #hud-label { position: absolute; top: 5px; left: 10px; font-size: 10px; color: var(--neon); z-index: 5; }
-        #hud-canvas { width: 100%; height: 100%; display: block; }
+        .hud-label { position: absolute; top: 5px; left: 10px; font-size: 9px; color: var(--neon); z-index: 5; background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 2px; }
+        .hud-canvas { width: 100%; height: 210px; display: block; border-bottom: 1px solid #1a2a3a; }
+        
+        .hud-data-row {
+            height: 50px; padding: 0 12px; font-size: 10px; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 210, 255, 0.05); color: var(--neon);
+        }
+        .data-val { font-size: 12px; font-weight: bold; color: #fff; }
+        .status-tag { padding: 2px 6px; border-radius: 2px; font-weight: bold; font-size: 10px; }
+        .st-pro { background: #2ed573; color: #000; }
+        .st-ret { background: #ff4757; color: #fff; }
+        .st-sta { background: #ffa502; color: #000; }
 
         .opt-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
-        .opt-btn { background: #0f172a; border: 1px solid var(--neon); color: var(--neon); padding: 8px; cursor: pointer; font-size: 0.7rem; border-radius: 2px; }
+        .opt-btn { background: #0f172a; border: 1px solid var(--neon); color: var(--neon); padding: 8px; cursor: pointer; font-size: 0.7rem; border-radius: 2px; text-align: left;}
         .opt-btn:hover { background: var(--neon); color: #000; }
 
-        .reset-all { margin-top: 25px; color: #ff4757; cursor: pointer; font-size: 0.7rem; border: 1px solid #ff4757; padding: 8px; width: 100%; background: none; text-transform: uppercase; }
+        .reset-all { margin-top: 20px; color: #ff4757; cursor: pointer; font-size: 0.7rem; border: 1px solid #ff4757; padding: 8px; width: 100%; background: none; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
     <h1>ASTRO_DYNAMICS</h1>
-    
     <div class="main-label" onclick="ui('cat_inf')">INFERIOR PLANETS</div>
     <div class="sub-menu">
         <button class="nav-btn" onclick="ui('inf_conj')">CONJUNCTION</button>
         <button class="nav-btn" onclick="ui('inf_elong')">GREATEST ELONGATION</button>
     </div>
-
     <div class="main-label" onclick="ui('cat_sup')">SUPERIOR PLANETS</div>
     <div class="sub-menu">
         <button class="nav-btn" onclick="ui('sup_conj')">CONJUNCTION</button>
         <button class="nav-btn" onclick="ui('sup_opp')">OPPOSITION</button>
         <button class="nav-btn" onclick="ui('sup_quad')">QUADRATURE / ELONGATION</button>
     </div>
-    
     <div class="main-label" onclick="ui('retrograde')">RETROGRADE MOTION</div>
     <div class="main-label" onclick="ui('transit')">TRANSIT</div>
-
     <button class="reset-all" onclick="resetSystem()">MASTER_RESET</button>
 </div>
 
@@ -113,9 +114,6 @@
     <div class="orbit" id="o-mar" style="width: 300px; height: 300px;"></div>
     <div class="orbit" id="o-jup" style="width: 380px; height: 380px;"></div>
     <div class="orbit" id="o-sat" style="width: 460px; height: 460px;"></div>
-    <div class="orbit" id="o-ura" style="width: 540px; height: 540px;"></div>
-    <div class="orbit" id="o-nep" style="width: 620px; height: 620px;"></div>
-    <div class="orbit" id="o-plu" style="width: 700px; height: 700px;"></div>
 
     <div id="p-mercury" class="p-node"><div class="p-core" style="width:6px; height:6px; background:#95a5a6"></div><div class="p-text">MERCURY</div></div>
     <div id="p-venus" class="p-node"><div class="p-core" style="width:12px; height:12px; background:#e67e22"></div><div class="p-text">VENUS</div></div>
@@ -123,207 +121,217 @@
     <div id="p-mars" class="p-node"><div class="p-core" style="width:10px; height:10px; background:#e74c3c"></div><div class="p-text">MARS</div></div>
     <div id="p-jupiter" class="p-node"><div class="p-core" style="width:20px; height:20px; background:#d39c7e"></div><div class="p-text">JUPITER</div></div>
     <div id="p-saturn" class="p-node"><div class="p-core" style="width:18px; height:18px; background:#f1c40f"></div><div class="p-text">SATURN</div></div>
-    <div id="p-uranus" class="p-node"><div class="p-core" style="width:14px; height:14px; background:#a4d8e1"></div><div class="p-text">URANUS</div></div>
-    <div id="p-neptune" class="p-node"><div class="p-core" style="width:14px; height:14px; background:#34495e"></div><div class="p-text">NEPTUNE</div></div>
-    <div id="p-pluto" class="p-node"><div class="p-core" style="width:6px; height:6px; background:#7f8c8d"></div><div class="p-text">PLUTO</div></div>
 </div>
 
 <div id="info-panel">
     <h2 id="info-h">TERMINAL</h2>
     <div id="info-b" class="info-b">Awaiting instructions...</div>
-    <div id="hud-container">
-        <div id="hud-label">OBSERVATION_PERSPECTIVE</div>
-        <canvas id="hud-canvas"></canvas>
+    
+    <div id="hud-wrap-azimuth" class="hud-wrapper">
+        <div id="label-azimuth" class="hud-label">ECLIPTIC_AZIMUTH_VIEW</div>
+        <canvas id="canvas-azimuth" class="hud-canvas"></canvas>
+        <div class="hud-data-row">
+            <div>λ (LONGITUDE): <span id="val-lambda" class="data-val">0.00°</span></div>
+            <div>STATUS: <span id="val-status" class="status-tag st-pro">PROGRADE</span></div>
+        </div>
     </div>
+
+    <div id="hud-wrap-sky" class="hud-wrapper">
+        <div id="label-sky" class="hud-label">SKY_TRAJECTORY (λ vs β)</div>
+        <canvas id="canvas-sky" class="hud-canvas"></canvas>
+        <div class="hud-data-row">
+            <div>β (LATITUDE): <span id="val-beta" class="data-val">0.00°</span></div>
+            <div id="flux-container" style="display:none">FLUX: <span id="val-flux" class="data-val">100.0%</span></div>
+        </div>
+    </div>
+
     <div id="opt-container" class="opt-grid"></div>
 </div>
 
 <script>
     const planets = {
-        mercury: { d: 40, s: 4.15, g: 'inf', c: '#95a5a6' }, venus: { d: 70, s: 1.62, g: 'inf', c: '#e67e22' }, earth: { d: 110, s: 1.0, g: 'ear', c: '#3498db' },
-        mars: { d: 150, s: 0.53, g: 'sup', c: '#e74c3c' }, jupiter: { d: 190, s: 0.08, g: 'sup', c: '#d39c7e' }, saturn: { d: 230, s: 0.034, g: 'sup', c: '#f1c40f' },
-        uranus: { d: 270, s: 0.011, g: 'sup', c: '#a4d8e1' }, neptune: { d: 310, s: 0.006, g: 'sup', c: '#34495e' }, pluto: { d: 350, s: 0.004, g: 'sup', c: '#7f8c8d' }
+        mercury: { d: 40, s: 4.15, g: 'inf', c: '#95a5a6', i: 7.0 }, 
+        venus: { d: 70, s: 1.62, g: 'inf', c: '#e67e22', i: 3.4 }, 
+        earth: { d: 110, s: 1.0, g: 'ear', c: '#3498db', i: 0 },
+        mars: { d: 150, s: 0.53, g: 'sup', c: '#e74c3c', i: 5.8 }, 
+        jupiter: { d: 190, s: 0.08, g: 'sup', c: '#d39c7e', i: 1.3 }, 
+        saturn: { d: 230, s: 0.034, g: 'sup', c: '#f1c40f', i: 2.5 }
     };
 
-    let angles = { mercury:0, venus:0, earth:0, mars:0, jupiter:0, saturn:0, uranus:0, neptune:0, pluto:0 };
-    let isLive = true;
-    let mode = 'idle';
-    let activeP = null; 
-    let retroPath = [];
-    let canvas = document.getElementById('hud-canvas');
-    let ctx = canvas.getContext('2d');
+    let angles = { mercury:0, venus:0, earth:0, mars:0, jupiter:0, saturn:0 };
+    let isLive = true, mode = 'idle', activeP = null; 
+    let pathAzimuth = [], pathSky = [], lastLambda = null;
+
+    const canAz = document.getElementById('canvas-azimuth');
+    const ctxAz = canAz.getContext('2d');
+    const canSky = document.getElementById('canvas-sky');
+    const ctxSky = canSky.getContext('2d');
 
     function setPos(p, deg) {
         const rad = deg * (Math.PI / 180);
         const el = document.getElementById('p-' + p);
+        if(!el) return;
         el.style.left = `calc(50% + ${Math.cos(rad) * planets[p].d}px)`;
         el.style.top = `calc(50% + ${Math.sin(rad) * planets[p].d}px)`;
     }
 
     function animate() {
+        let speedMult = 0.5; // 默认较快速度以便观测
+
+        if (mode === 'transit') {
+            // 实时计算金星与地球的夹角
+            let diff = Math.abs(((angles.venus - angles.earth + 180) % 360) - 180);
+            // 只有在接近合位置(15度内)才自动进入慢速模式
+            speedMult = (diff < 15) ? 0.1 : 1; 
+        }
+
         if (isLive) {
             Object.keys(planets).forEach(p => {
                 angles[p] = (angles[p] + planets[p].s) % 360;
                 setPos(p, angles[p]);
             });
         } else if (mode === 'retrograde' || mode === 'transit') {
-            syncUpdate();
+            syncUpdate(speedMult);
         }
         requestAnimationFrame(animate);
     }
 
-    function syncUpdate() {
-        angles.earth = (angles.earth + planets.earth.s) % 360;
+    function syncUpdate(speedMult) {
+        angles.earth = (angles.earth + planets.earth.s * speedMult) % 360;
         setPos('earth', angles.earth);
-        ctx.fillStyle = '#000'; ctx.fillRect(0,0,300,180);
+        ctxAz.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctxAz.fillRect(0,0,300,210);
+        ctxSky.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctxSky.fillRect(0,0,300,210);
 
         if (mode === 'retrograde' && activeP) {
-            angles[activeP] = (angles[activeP] + planets[activeP].s) % 360;
+            angles[activeP] = (angles[activeP] + planets[activeP].s * speedMult) % 360;
             setPos(activeP, angles[activeP]);
-            let ex = Math.cos(angles.earth * Math.PI/180) * planets.earth.d;
-            let ey = Math.sin(angles.earth * Math.PI/180) * planets.earth.d;
-            let px = Math.cos(angles[activeP] * Math.PI/180) * planets[activeP].d;
-            let py = Math.sin(angles[activeP] * Math.PI/180) * planets[activeP].d;
-            let relAng = Math.atan2(py - ey, px - ex);
-            
-            const currentPoint = {x: 150 + Math.cos(relAng)*65, y: 90 + Math.sin(relAng)*35};
-            retroPath.push(currentPoint);
-            if(retroPath.length > 500) retroPath.shift();
-            
-            // 绘制轨迹线
-            ctx.strokeStyle = planets[activeP].c; 
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            retroPath.forEach((p,i) => { if(i===0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
-            ctx.stroke();
+            const eR = angles.earth * Math.PI / 180, pR = angles[activeP] * Math.PI / 180, pInc = planets[activeP].i * Math.PI / 180;
+            const ex = Math.cos(eR) * planets.earth.d, ey = Math.sin(eR) * planets.earth.d;
+            const px = Math.cos(pR) * planets[activeP].d, py = Math.sin(pR) * planets[activeP].d * Math.cos(pInc), pz = Math.sin(pR) * planets[activeP].d * Math.sin(pInc);
+            const dx = px - ex, dy = py - ey, dz = pz;
+            const lambda = Math.atan2(dy, dx), beta = Math.atan2(dz, Math.sqrt(dx*dx + dy*dy)), lambdaDeg = (lambda * 180 / Math.PI + 360) % 360;
 
-            // 绘制行星球体 (新增部分)
-            ctx.fillStyle = planets[activeP].c;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = planets[activeP].c;
-            ctx.beginPath();
-            ctx.arc(currentPoint.x, currentPoint.y, 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0; // 重置阴影避免影响后续绘制
+            updateDataUI(lambdaDeg, beta);
+            drawTrack(ctxAz, pathAzimuth, { x: 150 + Math.cos(lambda)*80, y: 105 + Math.sin(lambda)*80 }, planets[activeP].c);
+            drawTrack(ctxSky, pathSky, { x: 150 + Math.cos(lambda)*130, y: 105 - beta*400 }, planets[activeP].c);
 
         } else if (mode === 'transit') {
-            angles.venus = (angles.venus + planets.venus.s) % 360;
+            angles.venus = (angles.venus + planets.venus.s * speedMult) % 360;
             setPos('venus', angles.venus);
-            ctx.fillStyle = '#ffda00'; ctx.beginPath(); ctx.arc(150, 90, 40, 0, Math.PI*2); ctx.fill();
+            // 绘制正圆太阳
+            ctxAz.fillStyle = '#ffda00'; ctxAz.beginPath(); ctxAz.arc(150, 105, 60, 0, Math.PI*2); ctxAz.fill();
+            ctxAz.strokeStyle = '#fff'; ctxAz.lineWidth = 1; ctxAz.stroke();
+
             let diff = ((angles.venus - angles.earth + 180) % 360) - 180;
-            if(Math.abs(diff) < 15) {
-                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(150 + (diff*8), 90, 4, 0, Math.PI*2); ctx.fill();
+            let flux = 1.0;
+            let vx = 150 + (diff * 6);
+            let dist = Math.abs(vx - 150);
+            let r_sun = 60, r_planet = 8;
+            
+            if(dist < (r_sun + r_planet)) {
+                ctxAz.fillStyle = '#000'; ctxAz.beginPath(); ctxAz.arc(vx, 105, r_planet, 0, Math.PI*2); ctxAz.fill();
+                // 缓变遮挡模型 (Smoothstep)
+                let edgeDist = r_sun + r_planet, fullDist = r_sun - r_planet;
+                if (dist > fullDist) {
+                    let t = (edgeDist - dist) / (edgeDist - fullDist);
+                    flux = 1.0 - (0.015 * t * t * (3 - 2 * t)); 
+                } else { flux = 0.985; }
             }
+            updateLightCurve(flux);
         }
+    }
+
+    function drawTrack(ctx, store, current, color) {
+        store.push(current); if(store.length > 1000) store.shift();
+        ctx.strokeStyle = color; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.4; ctx.beginPath();
+        store.forEach((p, i) => { if(i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); }); ctx.stroke();
+        ctx.globalAlpha = 1.0; ctx.shadowBlur = 15; ctx.shadowColor = color; ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(current.x, current.y, 4, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+    }
+
+    function updateDataUI(lambda, beta) {
+        const valL = document.getElementById('val-lambda'), valS = document.getElementById('val-status'), valB = document.getElementById('val-beta');
+        if (lastLambda !== null) {
+            let diff = lambda - lastLambda; if (diff > 180) diff -= 360; if (diff < -180) diff += 360;
+            if (Math.abs(diff) < 0.005) { valS.innerText = "STATIONARY"; valS.className = "status-tag st-sta"; }
+            else if (diff < 0) { valS.innerText = "RETROGRADE"; valS.className = "status-tag st-ret"; }
+            else { valS.innerText = "PROGRADE"; valS.className = "status-tag st-pro"; }
+        }
+        lastLambda = lambda; valL.innerText = lambda.toFixed(2) + "°"; valB.innerText = (beta * 180 / Math.PI).toFixed(2) + "°";
+    }
+
+    function updateLightCurve(flux) {
+        pathSky.push(flux); if(pathSky.length > 2000) pathSky.shift(); 
+        document.getElementById('val-flux').innerText = (flux * 100).toFixed(2) + "%";
+        ctxSky.clearRect(0, 0, 300, 210); ctxSky.strokeStyle = '#00d2ff'; ctxSky.lineWidth = 2; ctxSky.beginPath();
+        pathSky.forEach((f, i) => {
+            let x = i * (300 / pathSky.length);
+            let y = 180 - (f - 0.95) * 2500; // 调整缩放让曲线更美观
+            if(i === 0) ctxSky.moveTo(x, y); else ctxSky.lineTo(x, y);
+        }); ctxSky.stroke();
     }
 
     function ui(type) {
-        const h = document.getElementById('info-h');
-        const b = document.getElementById('info-b');
-        const hud = document.getElementById('hud-container');
-        const opts = document.getElementById('opt-container');
-        
-        resetH();
-        opts.innerHTML = '';
-        hud.style.display = 'none';
-        document.getElementById('info-panel').classList.add('active');
-        document.getElementById('system-container').style.marginRight = "30%";
+        const h = document.getElementById('info-h'), b = document.getElementById('info-b'), azHUD = document.getElementById('hud-wrap-azimuth'), skyHUD = document.getElementById('hud-wrap-sky'), opts = document.getElementById('opt-container');
+        resetH(); opts.innerHTML = ''; azHUD.style.display = 'none'; skyHUD.style.display = 'none'; document.getElementById('flux-container').style.display = 'none';
+        document.getElementById('info-panel').classList.add('active'); document.getElementById('system-container').style.marginRight = "30%";
 
         if (type === 'cat_inf') {
-            isLive = false; mode = 'static';
-            h.innerText = "Inferior Planets";
-            b.innerText = "Inferior planets are planets that orbit the Sun inside the Earth's orbit. These include Mercury and Venus. Because of their position, they exhibit phases like the Moon and can never reach opposition.";
+            isLive = false; mode = 'static'; h.innerText = "Inferior Planets";
+            b.innerText = "Inferior planets are those with orbits closer to the Sun than Earth's. In our solar system, these are Mercury and Venus. From Earth, they are never seen far from the Sun and exhibit phases similar to the Moon.";
             Object.keys(planets).forEach(p => { if(planets[p].g === 'inf') document.getElementById('p-'+p).classList.add('highlight'); });
         } else if (type === 'inf_conj') {
-            isLive = false; mode = 'static'; isolate(['venus', 'earth']);
-            h.innerText = "Conjunction";
-            b.innerText = "Conjunction occurs when two celestial objects appear close to each other in the sky. For inferior planets, there are two types: Inferior and Superior.";
+            isLive = false; mode = 'static'; isolate(['venus', 'earth']); h.innerText = "Conjunction (Inferior)";
             addOpt('Inferior Conjunction', () => { 
                 setPos('earth', 0); setPos('venus', 0); 
-                b.innerText = "Inferior conjunction occurs when an inferior planet lies between the Earth and the Sun. The planet is nearly in a “new phase,” with its dark side mostly facing Earth.";
+                b.innerText = "An inferior conjunction occurs when a planet, like Mercury or Venus, passes between the Earth and the Sun, aligning with them, making the planet appear closest to us but often hidden in the Sun's glare, sometimes resulting in a rare transit across the Sun's face. It's a key event for observing inferior planets at their largest size and as thin crescents."; 
             });
             addOpt('Superior Conjunction', () => { 
                 setPos('earth', 180); setPos('venus', 0); 
-                b.innerText = "Superior Conjunction: The Earth, Sun, and the other planet are arranged in a straight line, with the Sun in the middle. Because the object is on the opposite side of the Sun, it cannot be viewed from Earth.";
+                b.innerText = "A superior conjunction occurs when a planet (specifically Mercury or Venus) is on the opposite side of the Sun from the Earth, aligning all three bodies in a straight line. In this position, the Sun is situated between the Earth and the planet."; 
             });
         } else if (type === 'inf_elong') {
-            isLive = false; mode = 'static'; isolate(['venus', 'earth']);
-            h.innerText = "Greatest Elongation";
-            b.innerText = "Greatest elongation is the maximum angular distance between the Sun and an inferior planet. It represents the best time for viewing without solar interference.";
-            addOpt('Greatest Eastern Elongation', () => { 
-                setPos('earth', 0); setPos('venus', 45); 
-                b.innerText = "Eastern Elongation: The planet is furthest east of the Sun. Visible as an 'Evening Star' in the western sky after sunset.";
-            });
-            addOpt('Greatest Western Elongation', () => { 
-                setPos('earth', 0); setPos('venus', -45); 
-                b.innerText = "Western Elongation: The planet is furthest west of the Sun. Visible as a 'Morning Star' in the eastern sky before sunrise.";
-            });
+            isLive = false; mode = 'static'; isolate(['venus', 'earth']); h.innerText = "Greatest Elongation";
+            b.innerText = "Greatest elongation occurs when an inferior planet (Mercury or Venus) reaches its maximum angular distance from the Sun as viewed from Earth, providing the best viewing opportunity. At this point, the planet appears at its highest point above the horizon during twilight.";
+            addOpt('Eastern Elongation', () => { setPos('earth', 0); setPos('venus', 45); });
+            addOpt('Western Elongation', () => { setPos('earth', 0); setPos('venus', -45); });
         } else if (type === 'cat_sup') {
-            isLive = false; mode = 'static';
-            h.innerText = "Superior Planets";
-            b.innerText = "Superior planets orbit the Sun outside the Earth's orbit. This group includes Mars, Jupiter, Saturn, Uranus, Neptune, and the dwarf planet Pluto. They can reach opposition and be observed throughout the night.";
+            isLive = false; mode = 'static'; h.innerText = "Superior Planets";
+            b.innerText = "Superior planets (those with orbits outside Earth's, such as Mars or Jupiter) orbit the Sun outside the Earth's orbit. They only experience a regular 'conjunction' with the Sun, not an inferior or superior one, as they never pass between the Earth and the Sun.";
             Object.keys(planets).forEach(p => { if(planets[p].g === 'sup') document.getElementById('p-'+p).classList.add('highlight'); });
         } else if (type === 'sup_conj') {
-            isLive = false; mode = 'static'; isolate(['mars', 'earth']);
-            h.innerText = "Conjunction";
-            b.innerText = "For superior planets, conjunction occurs when the planet and the Sun appear together in the sky. The Earth, Sun, and planet are aligned in that order.";
-            setPos('earth', 180); setPos('mars', 0);
+            isLive = false; mode = 'static'; isolate(['mars', 'earth']); h.innerText = "Conjunction";
+            b.innerText = "Superior planets only experience a regular 'conjunction' with the Sun. This occurs when the planet and Sun align, but the planet never passes between Earth and the Sun."; setPos('earth', 180); setPos('mars', 0);
         } else if (type === 'sup_opp') {
-            isLive = false; mode = 'static'; isolate(['mars', 'earth']);
-            h.innerText = "Opposition";
-            b.innerText = "Opposition is when a superior planet is opposite the Sun in the Earth's sky. Earth is directly between the Sun and the planet. This is the optimal time for observation.";
-            setPos('earth', 0); setPos('mars', 0);
+            isLive = false; mode = 'static'; isolate(['mars', 'earth']); h.innerText = "Opposition";
+            b.innerText = "Opposition occurs when a superior planet appears opposite the Sun in the sky as seen from Earth, with Earth positioned approximately between the Sun and the planet. At this time, the planet is closest to Earth, fully illuminated, and visible all night."; setPos('earth', 0); setPos('mars', 0);
         } else if (type === 'sup_quad') {
-            isLive = false; mode = 'static'; isolate(['mars', 'earth']);
-            h.innerText = "Quadrature";
-            b.innerText = "Quadrature occurs when the direction to a superior planet is 90 degrees from the Earth-Sun line. The planet, Earth, and Sun form a right angle at the Earth vertex.";
+            isLive = false; mode = 'static'; isolate(['mars', 'earth']); h.innerText = "Quadrature";
+            b.innerText = "Quadrature occurs when the angular distance between the Sun and a planet is exactly 90 degrees as seen from Earth. The planet is 'sideways' to the Earth-Sun line.";
             addOpt('Eastern Quadrature', () => { setPos('earth', 0); setPos('mars', 90); });
             addOpt('Western Quadrature', () => { setPos('earth', 0); setPos('mars', 270); });
         } else if (type === 'retrograde') {
-            isLive = false; mode = 'retrograde'; activeP = null; retroPath = []; hud.style.display = 'block';
-            h.innerText = "Retrograde Motion";
-            b.innerText = "Generally, planets move from west to east (Prograde). Retrograde motion is the apparent backward (east to west) motion caused by Earth passing an outer planet or being passed by an inner planet.";
-            addOpt('Observe Mars', () => { activeP = 'mars'; retroPath = []; b.innerText = "Earth is passing Mars. The line of sight changes relative to distant stars, creating a backward loop."; });
-            addOpt('Observe Mercury', () => { activeP = 'mercury'; retroPath = []; b.innerText = "Mercury is passing Earth. Its faster orbital speed creates an apparent backward motion in our sky."; });
+            isLive = false; mode = 'retrograde'; activeP = null; pathAzimuth = []; pathSky = []; lastLambda = null; azHUD.style.display = 'block'; skyHUD.style.display = 'block';
+            document.getElementById('label-sky').innerText = "SKY_TRAJECTORY (λ vs β)"; h.innerText = "Retrograde Motion";
+            b.innerText = "Generally, planets move from west to east (Prograde). Retrograde motion is the apparent backward (east to west) motion caused by Earth's relative orbital speed 'lapping' an outer planet or being 'lapped' by an inner one.";
+            addOpt('Track Mars', () => { activeP = 'mars'; pathAzimuth = []; pathSky = []; lastLambda = null; });
+            addOpt('Track Mercury', () => { activeP = 'mercury'; pathAzimuth = []; pathSky = []; lastLambda = null; });
         } else if (type === 'transit') {
-            isLive = false; mode = 'transit'; isolate(['venus', 'earth']); hud.style.display = 'block';
-            h.innerText = "Transit";
-            b.innerText = "A transit occurs when an inferior planet passes directly in front of the Solar disk. This rare event requires precise alignment of the orbital planes.";
+            isLive = false; mode = 'transit'; isolate(['venus', 'earth']); azHUD.style.display = 'block'; skyHUD.style.display = 'block'; 
+            document.getElementById('label-azimuth').innerText = "SOLAR_DISK_OBSERVATION"; document.getElementById('label-sky').innerText = "LUMINOSITY_FLUX_ANALYSIS";
+            document.getElementById('flux-container').style.display = 'block';
+            h.innerText = "Venus Transit Watch";
+            b.innerText = "A transit occurs when an inferior planet passes directly in front of the Solar disk. This allows astronomers to measure the 'light curve'—the slight dip in solar brightness as the planet blocks a fraction of the star's surface.";
+            pathSky = new Array(2000).fill(1.0);
         }
     }
 
-    function addOpt(text, fn) {
-        const btn = document.createElement('button'); btn.className = 'opt-btn'; btn.innerText = text; btn.onclick = fn;
-        document.getElementById('opt-container').appendChild(btn);
-    }
+    function addOpt(t, f) { const btn = document.createElement('button'); btn.className = 'opt-btn'; btn.innerText = t; btn.onclick = f; document.getElementById('opt-container').appendChild(btn); }
+    function isolate(targets) { Object.keys(planets).forEach(k => { const vis = targets.includes(k) || k === 'earth'; document.getElementById('p-'+k).style.display = vis ? 'flex' : 'none'; const o = document.getElementById('o-'+k.slice(0,3)); if(o) o.style.display = vis ? 'block' : 'none'; }); }
+    function resetH() { Object.keys(planets).forEach(p => { const el = document.getElementById('p-'+p); if(el) { el.classList.remove('highlight'); el.style.display = 'flex'; } const o = document.getElementById('o-'+p.slice(0,3)); if(o) o.style.display = 'block'; }); }
+    function resetSystem() { isLive = true; mode = 'idle'; activeP = null; document.getElementById('info-panel').classList.remove('active'); document.getElementById('system-container').style.marginRight = "0"; document.getElementById('hud-wrap-azimuth').style.display = 'none'; document.getElementById('hud-wrap-sky').style.display = 'none'; resetH(); }
 
-    function isolate(targets) {
-        Object.keys(planets).forEach(k => {
-            const vis = targets.includes(k) || k === 'earth';
-            document.getElementById('p-'+k).style.display = vis ? 'flex' : 'none';
-            const o = document.getElementById('o-'+k.slice(0,3)); if(o) o.style.display = vis ? 'block' : 'none';
-        });
-    }
-
-    function resetH() {
-        Object.keys(planets).forEach(p => {
-            document.getElementById('p-'+p).classList.remove('highlight');
-            document.getElementById('p-'+p).style.display = 'flex';
-            const o = document.getElementById('o-'+p.slice(0,3)); if(o) o.style.display = 'block';
-        });
-    }
-
-    function resetSystem() {
-        isLive = true; mode = 'idle'; activeP = null;
-        document.getElementById('info-panel').classList.remove('active');
-        document.getElementById('system-container').style.marginRight = "0";
-        document.getElementById('hud-container').style.display = 'none';
-        resetH();
-    }
-
-    canvas.width = 300; canvas.height = 180;
+    canAz.width = 300; canAz.height = 210; canSky.width = 300; canSky.height = 210;
     animate();
 </script>
-
 </body>
 </html>
