@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Astro-Dynamics Command Center | Xiaohan Ma</title>
+    <title>Astro-Dynamics Command Center | Master Edition</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -21,7 +21,7 @@
         <button class="nav-btn" onclick="ui('sup_opp')">OPPOSITION</button>
         <button class="nav-btn" onclick="ui('sup_quad')">QUADRATURE</button>
     </div>
-    <div class="main-label" onclick="ui('retrograde')">RETROGRADE</div>
+    <div class="main-label" onclick="ui('retrograde')">RETROGRADE MOTION</div>
     <div class="main-label" onclick="ui('transit')">TRANSIT</div>
     <button class="reset-all" onclick="resetSystem()">MASTER_RESET</button>
 </div>
@@ -33,7 +33,7 @@
     <div class="orbit" id="o-ear" style="width: 170px; height: 170px;"></div>
     <div class="orbit" id="o-mar" style="width: 240px; height: 240px;"></div>
     <div class="orbit" id="o-jup" style="width: 320px; height: 320px;"></div>
-
+    
     <div id="p-mercury" class="p-node"><div class="p-core" style="width:5px; height:5px; background:#95a5a6"></div><div class="p-text">MER</div></div>
     <div id="p-venus" class="p-node"><div class="p-core" style="width:10px; height:10px; background:#e67e22"></div><div class="p-text">VEN</div></div>
     <div id="p-earth" class="p-node"><div class="p-core" style="width:12px; height:12px; background:#3498db"></div><div class="p-text">EAR</div></div>
@@ -46,19 +46,19 @@
     <div id="info-b" class="info-b">Awaiting instructions...</div>
     
     <div id="hud-wrap-azimuth" class="hud-wrapper">
-        <div id="label-azimuth" class="hud-label">AZIMUTH_VIEW</div>
+        <div id="label-azimuth" class="hud-label">ECLIPTIC_AZIMUTH_VIEW</div>
         <div class="hud-canvas-container"><canvas id="canvas-azimuth"></canvas></div>
         <div id="data-row-azimuth" class="hud-data-row">
-            <div>λ: <span id="val-lambda" class="data-val">0.00°</span></div>
+            <div>λ (LONGITUDE): <span id="val-lambda" class="data-val">0.00°</span></div>
             <div>STATUS: <span id="val-status" class="status-tag st-pro">PRO</span></div>
         </div>
     </div>
 
     <div id="hud-wrap-sky" class="hud-wrapper">
-        <div id="label-sky" class="hud-label">SKY_TRAJECTORY (8-Path)</div>
+        <div id="label-sky" class="hud-label">SKY_TRAJECTORY (λ vs β)</div>
         <div class="hud-canvas-container"><canvas id="canvas-sky"></canvas></div>
         <div id="data-row-sky" class="hud-data-row">
-            <div>β: <span id="val-beta" class="data-val">0.00°</span></div>
+            <div>β (LATITUDE): <span id="val-beta" class="data-val">0.00°</span></div>
             <div id="flux-container" style="display:none">FLUX: <span id="val-flux" class="data-val">100.0%</span></div>
         </div>
     </div>
