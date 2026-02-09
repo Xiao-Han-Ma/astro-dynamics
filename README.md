@@ -83,4 +83,3 @@ This project is designed to be hosted via **GitHub Pages**.
 
 ---
 
-**Would you like me to add a "Mathematical Appendix" to this README to explicitly document the Smoothstep flux equations for your portfolio?**
