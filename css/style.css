@@ -1,0 +1,197 @@
+:root {
+    --bg-dark: #05070a;
+    --neon: #00d2ff;
+    --glass: rgba(13, 20, 30, 0.85);
+    --border: rgba(0, 210, 255, 0.2);
+    --text-main: #e2e8f0;
+    --text-dim: #94a3b8;
+}
+
+body {
+    margin: 0; font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--bg-dark); color: var(--text-main);
+    display: flex; height: 100vh; overflow: hidden;
+    font-size: 16px; /* 保持大字号 */
+}
+
+/* --- 侧边栏 (保持大字体设计) --- */
+#sidebar {
+    width: 300px;
+    background: rgba(5, 10, 16, 0.95);
+    border-right: 1px solid var(--border); padding: 35px 25px;
+    z-index: 100; flex-shrink: 0; overflow-y: auto;
+}
+
+h1 { 
+    font-family: 'Space Grotesk', sans-serif; 
+    font-size: 1.1rem;
+    color: var(--neon); letter-spacing: 5px; text-align: center; 
+    border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 25px; 
+}
+
+.main-label {
+    color: var(--neon); 
+    font-size: 1rem;
+    margin: 30px 0 15px; border-left: 3px solid var(--neon); padding-left: 15px;
+    cursor: pointer; transition: 0.3s; font-weight: 700;
+}
+.main-label:hover { text-shadow: 0 0 10px var(--neon); padding-left: 20px; }
+
+.sub-menu { margin-left: 15px; display: flex; flex-direction: column; gap: 8px; }
+
+.nav-btn {
+    display: block; width: 100%; padding: 12px 15px; 
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-dim); cursor: pointer; text-align: left; 
+    font-size: 0.9rem;
+    border-radius: 6px; transition: 0.2s;
+}
+.nav-btn:hover { border-color: var(--neon); color: #fff; transform: translateX(5px); background: rgba(0, 210, 255, 0.05); }
+
+/* --- 模拟器容器 --- */
+#system-container {
+    flex-grow: 1; position: relative; display: flex;
+    justify-content: center; align-items: center;
+    background: radial-gradient(circle at center, #111827 0%, #05070a 100%);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden; /* 防止溢出 */
+}
+
+/* --- [关键修复] 天体形状矫正 --- */
+.orbit { 
+    position: absolute; 
+    border: 1px solid rgba(0, 210, 255, 0.08); 
+    border-radius: 50%; /* 确保轨道是圆的 */
+    pointer-events: none; 
+}
+
+#sun { 
+    width: 36px; height: 36px; /* 稍微加大太阳 */
+    aspect-ratio: 1 / 1; /* [修复] 强制保持正方形比例 */
+    background: #fff; 
+    border-radius: 50%; /* [修复] 确保渲染为正圆 */
+    box-shadow: 0 0 40px #f1c40f, 0 0 80px rgba(241, 196, 15, 0.3); 
+    z-index: 10; 
+    flex-shrink: 0; /* [修复] 防止被布局挤压 */
+}
+
+.highlight .p-core {
+    transform: scale(2.8); /* Significantly enlarged */
+    box-shadow: 0 0 30px var(--neon), 0 0 50px rgba(0, 210, 255, 0.6); /* Intense glow */
+    border: 2px solid #fff;
+    filter: brightness(1.5);
+}
+
+.highlight .p-text {
+    font-size: 12px; /* Enlarge label for highlighted planets */
+    text-shadow: 0 0 10px var(--neon);
+    color: #fff;
+}
+
+.p-node { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); z-index: 20; }
+
+.p-core { 
+    border-radius: 50%; /* [修复] 确保行星是圆的 */
+    aspect-ratio: 1 / 1; /* [修复] 强制比例 */
+    box-shadow: 0 0 15px rgba(255,255,255,0.2); 
+    transition: all 0.5s ease; 
+}
+
+.p-text { font-family: 'JetBrains Mono', monospace; font-size: 9px; margin-top: 5px; color: var(--neon); font-weight: 800; }
+.highlight .p-core { transform: scale(2.2); box-shadow: 0 0 30px var(--neon); border: 2px solid #fff; }
+
+/* --- 信息面板 (保持大字号设计) --- */
+#info-panel {
+    position: absolute; top: 20px; right: -42%; 
+    width: 38%; height: calc(100% - 40px);
+    background: var(--glass); border: 1px solid var(--border);
+    border-radius: 15px; padding: 40px; 
+    transition: right 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(25px); box-sizing: border-box; overflow-y: auto; z-index: 1000;
+    box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+}
+#info-panel.active { right: 25px; }
+
+.info-h { 
+    font-family: 'Space Grotesk', sans-serif; 
+    font-size: 1.6rem;
+    color: #fff; border-bottom: 3px solid var(--neon); 
+    padding-bottom: 15px; margin-bottom: 25px; 
+}
+
+.info-b { 
+    font-size: 1.05rem;
+    line-height: 1.8; 
+    color: var(--text-dim); margin-bottom: 30px; 
+}
+
+/* HUD 样式 */
+/* --- HUD 容器布局 --- */
+.hud-grid {
+    display: flex;
+    flex-direction: column; /* 默认上下排布，适配凌日模式 */
+    gap: 20px;
+    width: 100%;
+}
+
+/* 逆行模式下的横向排布类 */
+.hud-grid.horizontal {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.hud-grid.horizontal .hud-wrapper {
+    flex: 1; /* 平分空间 */
+    margin-top: 0; /* 消除之前的上边距 */
+    min-width: 0; /* 防止内容撑破容器 */
+}
+
+/* 保护：确保在并排时 Canvas 依然维持正确比例 */
+.hud-canvas-container {
+    width: 100%;
+    height: auto; /* 自动高度以维持比例 */
+    aspect-ratio: 300 / 210;
+    display: flex;
+    justify-content: center;
+    background: #000;
+}
+/* .hud-canvas-container { width: 100%; height: 220px; display: flex; justify-content: center; background: #000; border-bottom: 1px solid #1a2a3a; } */
+
+
+.hud-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* [修正] 确保绘图内容不拉伸 */
+}
+/* .hud-canvas { height: 100%; aspect-ratio: 300/210; } */
+
+
+/* 针对大字号下的并排显示微调 */
+.hud-grid.horizontal .hud-data-row {
+    flex-direction: column; /* 并排时空间变窄，数据项改为上下排布 */
+    align-items: flex-start;
+    gap: 5px;
+    padding: 10px;
+}
+.hud-wrapper { width: 100%; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--border); border-radius: 12px; margin-top: 25px; overflow: hidden; }
+.hud-label { padding: 10px 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--neon); background: rgba(0, 210, 255, 0.1); font-weight: bold; letter-spacing: 1px; }
+.hud-data-row { font-family: 'JetBrains Mono', monospace; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--neon); }
+.data-val { color: #fff; font-weight: 700; font-size: 15px; }
+.status-tag { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+.st-pro { background: rgba(46, 213, 115, 0.2); color: #2ed573; }
+.st-ret { background: rgba(255, 71, 87, 0.2); color: #ff4757; }
+.st-sta { background: rgba(255, 165, 2, 0.2); color: #ffa502; }
+
+.opt-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
+.opt-btn { background: rgba(0, 210, 255, 0.05); border: 1px solid var(--neon); color: var(--neon); padding: 15px; cursor: pointer; margin-top: 0; width: 100%; text-align: left; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; font-family: 'Inter', sans-serif; font-weight: 600; }
+.opt-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
+
+.reset-all { margin-top: 40px; color: #ff4757; cursor: pointer; font-size: 0.85rem; border: 1px solid rgba(255, 71, 87, 0.3); padding: 15px; width: 100%; background: rgba(255, 71, 87, 0.05); border-radius: 6px; transition: 0.3s; font-weight: bold; letter-spacing: 2px; }
+.reset-all:hover { background: #ff4757; color: #fff; box-shadow: 0 0 20px rgba(255, 71, 87, 0.4); }
+
+@media (max-width: 768px) {
+    body { flex-direction: column; overflow-y: auto; height: auto; }
+    #sidebar { width: 100%; position: sticky; top: 0; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
+    #system-container { width: 100%; height: 50vh; min-height: 350px; }
+    #info-panel { position: static; width: 100%; height: auto; border-radius: 25px 25px 0 0; margin-top: -25px; padding: 30px; }
+}
